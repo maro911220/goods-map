@@ -47,19 +47,3 @@ yarn dev
 ```
 http://localhost:3000
 ```
-
-## 데이터 추가하기
-
-`src/data/markers.json` 파일에 새로운 굿즈샵 정보를 추가할 수 있습니다.
-
-```json
-{
-  "title": string,
-  "address": string,
-  "lat": number,
-  "lng": number,
-  "description": string,
-  "link": string,
-  "sns": string | null
-}
-```
