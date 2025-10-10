@@ -15,8 +15,8 @@
 1. **저장소 클론**
 
 ```bash
-git clone https://github.com/maro911220/hongdae-goodsshop.git
-cd hongdae-goodsshop
+git clone https://github.com/maro911220/goods-map.git
+cd goods-map
 ```
 
 2. **의존성 설치**
