@@ -30,7 +30,7 @@ yarn install
 3. **환경 변수 설정**
 
 ```bash
-# .env.local 파일 생성
+# .env.local 파일 생성 ( kakao developers 설정 필요 )
 NEXT_PUBLIC_KAKAO_MAP_KEY=your_kakao_javascript_key
 ```
 
