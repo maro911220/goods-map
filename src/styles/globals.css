@@ -12,6 +12,11 @@
   --font-mono: var(--font-geist-mono);
 }
 
+html,
+body {
+  @apply w-full h-full overflow-hidden;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -19,5 +24,5 @@ body {
 }
 
 .main {
-  @apply flex flex-col-reverse overflow-hidden w-full h-screen sm:flex-row;
+  @apply flex flex-col-reverse overflow-hidden w-full h-full sm:flex-row;
 }
