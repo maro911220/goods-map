@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+.panel {
+  @apply flex-none flex flex-col;
+  @apply w-full h-[280px] sm:h-full sm:w-[300px];
+  @apply bg-white z-10 p-3 overflow-y-auto border-r border-gray-300;
+}
+
+.panel-input {
+  @apply w-full px-3 py-2;
+  @apply border border-gray-300 rounded-md transition-all;
+  @apply focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent;
+}
+
+.panel-no-results {
+  @apply py-4;
+  @apply text-gray-500 text-sm text-center;
+}
+
+.panel-list {
+  @apply flex-1 space-y-1 pb-2 overflow-y-auto;
+}
+
+.panel-list-item {
+  @apply p-2 rounded-md cursor-pointer transition-colors hover:bg-gray-100;
+}
+
+.panel-list-item.active {
+  @apply bg-rose-500 text-white hover:bg-rose-500;
+}
+
+.panel-list-item__title {
+  @apply font-medium text-sm;
+}
+
+.panel-list-item__address {
+  @apply text-xs text-gray-500;
+}
+
+.panel-list-item.active .panel-list-item__address {
+  @apply text-white/80;
+}
+
+.panel-footer {
+  @apply flex justify-between border-t border-gray-300 pt-2 mt-auto mb-0;
+}
+
+.panel-footer-link {
+  @apply inline-block text-rose-500 font-bold hover:underline;
+}
