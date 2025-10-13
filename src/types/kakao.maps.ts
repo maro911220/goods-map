@@ -88,6 +88,9 @@ export interface UseKakaoMapReturn {
   isModalOpen: boolean;
   modalContent: Marker | null;
   closeModal: () => void;
+  isLoading: boolean;
+  error: string | null;
+  markers: Marker[];
 }
 
 // Global 타입 확장

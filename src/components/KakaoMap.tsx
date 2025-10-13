@@ -1,36 +1,14 @@
-"use client";
-import { useRef } from "react";
-import { useKakaoMap } from "@/hooks/useKakaoMap";
-import PlaceModal from "@/components/PlaceModal";
-import { Marker } from "@/types/kakao.maps";
+import { forwardRef } from "react";
 
-interface KakaoMapProps {
-  selectedMarker: Marker | null;
-}
-
-const KakaoMap = ({ selectedMarker }: KakaoMapProps) => {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const { isModalOpen, modalContent, closeModal } = useKakaoMap({
-    containerRef,
-    selectedMarker,
-  });
-
+const KakaoMap = forwardRef<HTMLDivElement>((props, ref) => {
   return (
     <section className="w-full h-full">
-      <h2 className="hidden">지도 영역</h2>
-      <div
-        id="map"
-        ref={containerRef}
-        aria-label="Kakao 지도"
-        className="w-full h-full"
-      />
-      <PlaceModal
-        isModalOpen={isModalOpen}
-        modalContent={modalContent}
-        closeModal={closeModal}
-      />
+      <h2 className="hidden">카카오 지도</h2>
+      <div ref={ref} className="w-full h-full" id="kakao-map" />
     </section>
   );
-};
+});
+
+KakaoMap.displayName = "KakaoMap";
 
 export default KakaoMap;

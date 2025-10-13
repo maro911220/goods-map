@@ -1,19 +1,20 @@
 import { useState, useMemo } from "react";
 import { Marker } from "@/types/kakao.maps";
-import markersData from "@/data/markers.json";
+import { useKakaoMap } from "@/hooks/useKakaoMap";
 import "@/styles/components/searchpanel.css";
 
 interface SearchPanelProps {
   onMarkerClick: (marker: Marker) => void;
   selectedMarker?: Marker | null;
+  markers: Marker[];
 }
 
 const SearchPanel: React.FC<SearchPanelProps> = ({
   onMarkerClick,
   selectedMarker,
+  markers,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const markers = markersData as Marker[];
 
   // 검색 로직
   const filteredMarkers = useMemo(() => {

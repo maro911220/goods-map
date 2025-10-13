@@ -8,7 +8,6 @@ import {
   UseKakaoMapReturn,
 } from "@/types/kakao.maps";
 import { debounce } from "@/utils/debounce";
-import markersData from "@/data/markers.json";
 
 // 카카오맵 설정
 const MAP_CONFIG = {
@@ -27,9 +26,33 @@ export const useKakaoMap = ({
   const overlaysRef = useRef<KakaoCustomOverlay[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState<Marker | null>(null);
+  const [markers, setMarkers] = useState<Marker[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // JSON 파일에서 마커 데이터 로드
-  const markers = markersData as Marker[];
+  // API에서 마커 데이터 가져오기
+  useEffect(() => {
+    const fetchMarkers = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const response = await fetch("https://maroapi.vercel.app/api/goods");
+        if (!response.ok)
+          throw new Error(`Failed to fetch markers: ${response.status}`);
+        const data = await response.json();
+        setMarkers(data);
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to load markers";
+        setError(errorMessage);
+        console.error("Error fetching markers:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMarkers();
+  }, []);
 
   // 마커 관련 함수
   const openModal = useCallback((place: Marker) => {
@@ -91,6 +114,8 @@ export const useKakaoMap = ({
       return;
     }
 
+    if (isLoading || markers.length === 0) return;
+
     window.kakao.maps.load(() => {
       const container = containerRef.current;
       if (!container) return;
@@ -116,12 +141,12 @@ export const useKakaoMap = ({
       createMarkers(map);
     });
 
+    // 컴포넌트 언마운트 시 오버레이 정리
     return () => {
-      // 컴포넌트 언마운트 시 오버레이 정리
       overlaysRef.current.forEach((overlay) => overlay.setMap(null));
       overlaysRef.current = [];
     };
-  }, [containerRef, createMarkers]);
+  }, [containerRef, createMarkers, isLoading, markers]);
 
   // 선택된 마커로 지도 이동
   useEffect(() => {
@@ -156,5 +181,12 @@ export const useKakaoMap = ({
     };
   }, [containerRef]);
 
-  return { isModalOpen, modalContent, closeModal };
+  return {
+    isModalOpen,
+    modalContent,
+    markers,
+    closeModal,
+    isLoading,
+    error,
+  };
 };
