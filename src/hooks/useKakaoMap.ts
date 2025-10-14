@@ -12,7 +12,7 @@ import { debounce } from "@/utils/debounce";
 
 // 카카오맵 설정
 const MAP_CONFIG = {
-  CENTER: { lat: 37.555, lng: 126.92501 },
+  CENTER: { lat: 37.55667, lng: 126.92361 },
   INITIAL_LEVEL: 3,
   MIN_LEVEL: 1,
   MAX_LEVEL: 6,
