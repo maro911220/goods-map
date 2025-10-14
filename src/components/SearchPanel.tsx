@@ -1,6 +1,5 @@
 import { useState, useMemo } from "react";
 import { Marker } from "@/types/kakao.maps";
-import { useKakaoMap } from "@/hooks/useKakaoMap";
 import "@/styles/components/searchpanel.css";
 
 interface SearchPanelProps {

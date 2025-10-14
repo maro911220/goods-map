@@ -5,7 +5,7 @@ import "@/styles/globals.css";
 
 // 메타데이터
 const title = "홍대 굿즈샵";
-const description = "maro가 정리한 홍대 굿즈샵 정보 지도";
+const description = "내가 정리한 홍대 굿즈샵 정보 지도";
 const url =
   process.env.NODE_ENV === "development"
     ? "http://localhost:3000"
@@ -50,7 +50,7 @@ export default function RootLayout({
     <html lang="ko">
       <head>
         <Script
-          src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_MAP_APP_KEY}&autoload=false&libraries=services`}
+          src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_MAP_APP_KEY}&autoload=false&libraries=services,clusterer`}
           strategy="beforeInteractive"
         />
       </head>

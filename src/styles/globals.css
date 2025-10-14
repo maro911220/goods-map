@@ -26,3 +26,15 @@ body {
 .main {
   @apply flex flex-col-reverse overflow-hidden w-full h-full sm:flex-row;
 }
+
+.main.log {
+  @apply items-center justify-center text-center;
+}
+
+.main.log p {
+  @apply text-lg font-semibold;
+}
+
+.main.log span {
+  @apply text-sm text-gray-500 mt-2;
+}

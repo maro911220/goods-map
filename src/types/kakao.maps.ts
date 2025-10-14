@@ -44,6 +44,7 @@ export interface Marker {
   description: string;
   link: string;
   sns?: string | null;
+  category: string[];
 }
 
 // Kakao Maps Geocoding 타입
@@ -66,8 +67,55 @@ export interface KakaoGeocoderStatus {
   ERROR: string;
 }
 
-// Kakao Maps SDK 네임스페이스
+// Kakao Maps SDK
+
 export interface KakaoMapsNamespace {
+  Marker: new (options: {
+    position: KakaoLatLng;
+    image?: {
+      url: string;
+      imageSize: KakaoSize;
+      imageOption?: { offset: KakaoPoint };
+    };
+    clickable?: boolean;
+  }) => void;
+  MarkerClusterer: new (options: {
+    map: KakaoMap;
+    averageCenter?: boolean;
+    minLevel?: number;
+    disableClickZoom?: boolean;
+    styles?: Array<{
+      width: string;
+      height: string;
+      background: string;
+      borderRadius?: string;
+      color?: string;
+      textAlign?: string;
+      fontWeight?: string;
+      lineHeight?: string;
+      fontSize?: string;
+      border?: string;
+      boxShadow?: string;
+      display?: string;
+      justifyContent?: string;
+      alignItems?: string;
+    }>;
+  }) => {
+    addMarkers: (markers: []) => void;
+    clear: () => void;
+  };
+
+  MarkerImage: new (
+    url: string,
+    imageSize: KakaoSize,
+    imageOption?: { offset: KakaoPoint }
+  ) => {
+    url: string;
+    imageSize: KakaoSize;
+    imageOption?: { offset: KakaoPoint };
+  };
+  Point: new (x: number, y: number) => KakaoPoint;
+  Size: new (width: number, height: number) => KakaoSize;
   LatLng: new (lat: number, lng: number) => KakaoLatLng;
   Map: new (container: HTMLElement, options: KakaoMapOptions) => KakaoMap;
   CustomOverlay: new (options: KakaoCustomOverlayOptions) => KakaoCustomOverlay;
@@ -75,13 +123,33 @@ export interface KakaoMapsNamespace {
     Geocoder: new () => KakaoGeocoder;
     Status: KakaoGeocoderStatus;
   };
+  event: {
+    addListener: (target: unknown, type: string, callback: () => void) => void;
+    removeListener: (
+      target: unknown,
+      type: string,
+      callback: () => void
+    ) => void;
+  };
   load(callback: () => void): void;
+}
+
+// 추가 인터페이스
+export interface KakaoPoint {
+  x: number;
+  y: number;
+}
+
+export interface KakaoSize {
+  width: number;
+  height: number;
 }
 
 // Hook 타입
 export interface UseKakaoMapProps {
   containerRef: RefObject<HTMLDivElement | null>;
   selectedMarker: Marker | null;
+  filteredMarkers: Marker[];
 }
 
 export interface UseKakaoMapReturn {
