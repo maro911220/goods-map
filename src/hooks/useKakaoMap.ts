@@ -3,7 +3,6 @@ import {
   Marker,
   KakaoMap,
   KakaoCustomOverlay,
-  KakaoCustomOverlayOptions,
   UseKakaoMapProps,
   UseKakaoMapReturn,
 } from "@/types/kakao.maps";
@@ -14,31 +13,37 @@ const MAP_CONFIG = {
   CENTER: { lat: 37.555, lng: 126.92501 },
   INITIAL_LEVEL: 3,
   MIN_LEVEL: 1,
-  MAX_LEVEL: 4,
+  MAX_LEVEL: 6,
   DRAGGABLE: true,
+  CLUSTER_LEVEL: 4,
 };
 
 export const useKakaoMap = ({
   containerRef,
   selectedMarker,
+  filteredMarkers,
 }: UseKakaoMapProps): UseKakaoMapReturn => {
   const mapRef = useRef<KakaoMap | null>(null);
   const overlaysRef = useRef<KakaoCustomOverlay[]>([]);
+  const clustererRef = useRef<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState<Marker | null>(null);
   const [markers, setMarkers] = useState<Marker[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // API에서 마커 데이터 가져오기
+  // API에서 데이터 가져오기
   useEffect(() => {
     const fetchMarkers = async () => {
       try {
         setIsLoading(true);
         setError(null);
         const response = await fetch("https://maroapi.vercel.app/api/goods");
-        if (!response.ok)
+
+        if (!response.ok) {
           throw new Error(`Failed to fetch markers: ${response.status}`);
+        }
+
         const data = await response.json();
         setMarkers(data);
       } catch (err) {
@@ -54,7 +59,7 @@ export const useKakaoMap = ({
     fetchMarkers();
   }, []);
 
-  // 마커 관련 함수
+  // 마커 모달 오픈 및 클로즈 핸들러
   const openModal = useCallback((place: Marker) => {
     setModalContent(place);
     setIsModalOpen(true);
@@ -65,18 +70,33 @@ export const useKakaoMap = ({
     setModalContent(null);
   }, []);
 
-  // 커스텀 마커
-  const createOverlayElement = useCallback(
-    (title: string, onClick: () => void): HTMLElement => {
-      const element = document.createElement("div");
-      element.classList.value =
-        "px-1.5 py-1 bg-rose-500 text-white rounded font-bold text-xs shadow-lg whitespace-nowrap border-2 border-white cursor-pointer ";
-      element.textContent = title;
-      element.onclick = onClick;
-      return element;
-    },
-    []
-  );
+  // 커스텀 마커 이미지 생성
+  const createCustomMarkerImage = useCallback((title: string) => {
+    const { kakao } = window;
+    if (!kakao?.maps) return null;
+
+    // SVG로 커스텀 마커 생성
+    const width = title.length * 8 + 36;
+    const svgContent = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="30">
+        <rect x="2" y="2" width="${width - 4}" height="26" 
+              fill="#f43f5e" stroke="white" stroke-width="2" rx="4"/>
+        <text x="${width / 2}" y="20" 
+              font-family="Arial" font-size="12" font-weight="bold" 
+              fill="white" text-anchor="middle">${title}</text>
+      </svg>
+    `;
+
+    const svgBlob = new Blob([svgContent], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(svgBlob);
+
+    const imageSize = new kakao.maps.Size(width, 30);
+    const imageOption = {
+      offset: new kakao.maps.Point(width / 2, 15),
+    };
+
+    return new kakao.maps.MarkerImage(url, imageSize, imageOption);
+  }, []);
 
   // 마커 생성 및 지도에 추가
   const createMarkers = useCallback(
@@ -84,27 +104,74 @@ export const useKakaoMap = ({
       const { kakao } = window;
       if (!kakao?.maps) return;
 
-      // 기존 오버레이 제거 (중복 방지)
+      // 기존 클러스터러 제거
+      if (clustererRef.current) {
+        clustererRef.current.clear();
+      }
+
+      // 기존 오버레이 제거
       overlaysRef.current.forEach((overlay) => overlay.setMap(null));
       overlaysRef.current = [];
 
-      markers.forEach((marker) => {
-        const position = new kakao.maps.LatLng(marker.lat, marker.lng);
-        const content = createOverlayElement(marker.title, () =>
-          openModal(marker)
-        );
+      // 필터링된 마커가 있으면 사용, 없으면 전체 마커 사용
+      const markersToDisplay =
+        filteredMarkers && filteredMarkers.length > 0
+          ? filteredMarkers
+          : markers;
 
-        const overlayOptions: KakaoCustomOverlayOptions = {
+      // 카카오 마커 객체 생성
+      const kakaoMarkers = markersToDisplay.map((marker) => {
+        const position = new kakao.maps.LatLng(marker.lat, marker.lng);
+        const markerImage = createCustomMarkerImage(marker.title);
+
+        const markerOptions: any = {
           position,
-          content,
+          clickable: true,
         };
 
-        const overlay = new kakao.maps.CustomOverlay(overlayOptions);
-        overlay.setMap(map);
-        overlaysRef.current.push(overlay);
+        if (markerImage) {
+          markerOptions.image = markerImage;
+        }
+
+        const kakaoMarker = new kakao.maps.Marker(markerOptions);
+        // 마커 클릭 이벤트
+        kakao.maps.event.addListener(kakaoMarker, "click", () => {
+          openModal(marker);
+        });
+
+        return kakaoMarker;
       });
+
+      // 클러스터러 생성
+      if (!clustererRef.current) {
+        clustererRef.current = new kakao.maps.MarkerClusterer({
+          map: map,
+          minLevel: MAP_CONFIG.CLUSTER_LEVEL,
+          averageCenter: true,
+          disableClickZoom: false,
+          styles: [
+            {
+              color: "#fff",
+              width: "60px",
+              height: "60px",
+              display: "flex",
+              fontSize: "16px",
+              fontWeight: "bold",
+              textAlign: "center",
+              borderRadius: "30px",
+              alignItems: "center",
+              justifyContent: "center",
+              border: "3px solid white",
+              background: "rgba(244, 63, 94, 0.8)",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            },
+          ],
+        });
+      }
+
+      clustererRef.current.addMarkers(kakaoMarkers);
     },
-    [markers, createOverlayElement, openModal]
+    [markers, filteredMarkers, createCustomMarkerImage, openModal]
   );
 
   // 지도 초기화
@@ -114,6 +181,7 @@ export const useKakaoMap = ({
       return;
     }
 
+    // 마커 데이터가 로드될 때까지 대기
     if (isLoading || markers.length === 0) return;
 
     window.kakao.maps.load(() => {
@@ -141,14 +209,24 @@ export const useKakaoMap = ({
       createMarkers(map);
     });
 
-    // 컴포넌트 언마운트 시 오버레이 정리
     return () => {
+      if (clustererRef.current) {
+        clustererRef.current.clear();
+      }
       overlaysRef.current.forEach((overlay) => overlay.setMap(null));
       overlaysRef.current = [];
     };
-  }, [containerRef, createMarkers, isLoading, markers]);
+  }, [containerRef, isLoading, markers.length]);
 
-  // 선택된 마커로 지도 이동
+  // 필터링으로 인한 지도 업데이트
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || markers.length === 0) return;
+
+    createMarkers(map);
+  }, [filteredMarkers, markers, openModal]);
+
+  // 리스트 선택 시 지도 이동
   useEffect(() => {
     if (!mapRef.current || !selectedMarker) return;
 
@@ -184,9 +262,9 @@ export const useKakaoMap = ({
   return {
     isModalOpen,
     modalContent,
-    markers,
     closeModal,
     isLoading,
     error,
+    markers,
   };
 };

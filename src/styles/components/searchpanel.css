@@ -3,7 +3,7 @@
 .panel {
   @apply flex-none flex flex-col;
   @apply w-full h-[280px] sm:h-full sm:w-[300px];
-  @apply bg-white z-10 p-3 overflow-y-auto border-r border-gray-300;
+  @apply bg-white z-10 p-3 overflow-y-auto border-t sm:border-t-0 sm:border-r border-gray-300;
 }
 
 .panel-input {
@@ -18,7 +18,19 @@
 }
 
 .panel-list {
-  @apply flex-1 space-y-1 pb-2 overflow-y-auto;
+  @apply flex-1 space-y-1 mb-2 overflow-y-auto;
+}
+
+.panel-list::-webkit-scrollbar {
+  @apply w-2 h-2;
+}
+
+.panel-list::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-lg;
+}
+
+.panel-list::-webkit-scrollbar-track {
+  @apply bg-gray-100 rounded-lg;
 }
 
 .panel-list-item {

@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+.category {
+  @apply absolute top-4 left-4 z-10;
+}
+
+.category-btn {
+  @apply border border-gray-300 bg-white hover:bg-gray-100;
+  @apply px-4 py-2 rounded-lg shadow-lg cursor-pointer font-semibold text-sm transition-colors flex items-center gap-2;
+}
+
+.category-box {
+  @apply mt-2 bg-white rounded-lg shadow-lg border border-gray-300 p-4 w-64 max-h-96 overflow-y-auto;
+}
+
+.category-box-header {
+  @apply flex items-center justify-between mb-3 pb-3 border-b border-gray-300;
+}
+
+.category-box-header p {
+  @apply font-bold text-sm;
+}
+
+.category-box-header button {
+  @apply text-xs text-rose-500 hover:text-rose-600 font-medium cursor-pointer;
+}
+
+.category-box-list {
+  @apply space-y-1;
+}
+
+.category-box-item {
+  @apply flex items-center gap-2 cursor-pointer text-sm p-1.5 rounded;
+  @apply transition-colors hover:bg-gray-100;
+}
+
+.category-box-item input {
+  @apply hidden;
+}
+
+.category-box-item span {
+  @apply relative pl-5;
+}
+
+.category-box-item span::before,
+.category-box-item span::after {
+  @apply absolute w-4 h-4 left-0 top-0;
+}
+
+.category-box-item span::before {
+  content: "";
+  @apply translate-y-0.5 inline-flex border border-gray-500 rounded;
+}
+
+.category-box-item input:checked + span::before {
+  @apply bg-rose-500 border-rose-500;
+}
+
+.category-box-item span::after {
+  content: "\2713";
+  @apply hidden text-center text-white;
+}
+
+.category-box-item input:checked + span::after {
+  @apply inline-block;
+}
