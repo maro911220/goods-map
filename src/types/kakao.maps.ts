@@ -68,17 +68,23 @@ export interface KakaoGeocoderStatus {
 }
 
 // Kakao Maps SDK
+export interface MarkerOptions {
+  position: KakaoLatLng;
+  clickable?: boolean;
+  image?: {
+    url: string;
+    imageSize: KakaoSize;
+    imageOption?: { offset: KakaoPoint };
+  };
+}
+
+export interface KakaoMarkerClustererInstance {
+  addMarkers: (markers: unknown[]) => void;
+  clear: () => void;
+}
 
 export interface KakaoMapsNamespace {
-  Marker: new (options: {
-    position: KakaoLatLng;
-    image?: {
-      url: string;
-      imageSize: KakaoSize;
-      imageOption?: { offset: KakaoPoint };
-    };
-    clickable?: boolean;
-  }) => void;
+  Marker: new (options: MarkerOptions) => void;
   MarkerClusterer: new (options: {
     map: KakaoMap;
     averageCenter?: boolean;
@@ -100,10 +106,7 @@ export interface KakaoMapsNamespace {
       justifyContent?: string;
       alignItems?: string;
     }>;
-  }) => {
-    addMarkers: (markers: []) => void;
-    clear: () => void;
-  };
+  }) => KakaoMarkerClustererInstance;
 
   MarkerImage: new (
     url: string,
