@@ -2,9 +2,11 @@ import { useEffect, useRef, useCallback, useState } from "react";
 import {
   Marker,
   KakaoMap,
+  MarkerOptions,
   KakaoCustomOverlay,
   UseKakaoMapProps,
   UseKakaoMapReturn,
+  KakaoMarkerClustererInstance,
 } from "@/types/kakao.maps";
 import { debounce } from "@/utils/debounce";
 
@@ -25,7 +27,7 @@ export const useKakaoMap = ({
 }: UseKakaoMapProps): UseKakaoMapReturn => {
   const mapRef = useRef<KakaoMap | null>(null);
   const overlaysRef = useRef<KakaoCustomOverlay[]>([]);
-  const clustererRef = useRef<any>(null);
+  const clustererRef = useRef<KakaoMarkerClustererInstance | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState<Marker | null>(null);
   const [markers, setMarkers] = useState<Marker[]>([]);
@@ -124,7 +126,7 @@ export const useKakaoMap = ({
         const position = new kakao.maps.LatLng(marker.lat, marker.lng);
         const markerImage = createCustomMarkerImage(marker.title);
 
-        const markerOptions: any = {
+        const markerOptions: MarkerOptions = {
           position,
           clickable: true,
         };
